@@ -1,4 +1,4 @@
-# This template installs MariaDB and all dependencies needed for importing from vanilla.
+# This template installs MariaDB and all dependencies needed for importing from flarum.
 
 params:
   home: /var/www/discourse
@@ -66,7 +66,7 @@ hooks:
           sv stop mysql
 
     - file:
-        path: /usr/local/bin/import_vanilla.sh
+        path: /usr/local/bin/import_flarum.sh
         chmod: "+x"
         contents: |
           #!/bin/bash
@@ -78,7 +78,7 @@ hooks:
           mysql -uroot -e "UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE user = 'root' AND plugin = 'unix_socket'"
           mysql -uroot -e "FLUSH PRIVILEGES"
 
-          if [ -f "/shared/import/data/vanilla_mysql.sql" ]; then
+          if [ -f "/shared/import/data/ajalan.sql" ]; then
             if [ -f "/shared/import/mysql/imported" ] && ! sha256sum --check /shared/import/mysql/imported &>/dev/null ; then
               echo "Checksum of database dump changed..."
               rm /shared/import/mysql/imported
@@ -86,19 +86,19 @@ hooks:
 
             if [ ! -f "/shared/import/mysql/imported" ]; then
               echo "Loading database dump into MySQL..."
-              mysql -uroot -e "DROP DATABASE IF EXISTS vanilla"
-              mysql -uroot -e "CREATE DATABASE vanilla"
-              mysql -uroot --default-character-set=utf8 --database=vanilla < /shared/import/data/vanilla_mysql.sql
-              sha256sum /shared/import/data/vanilla_mysql.sql > /shared/import/mysql/imported
+              mysql -uroot -e "DROP DATABASE IF EXISTS flarum"
+              mysql -uroot -e "CREATE DATABASE flarum"
+              mysql -uroot --default-character-set=utf8 --database=flarum < /shared/import/data/ajalan.sql
+              sha256sum /shared/import/data/ajalan.sql > /shared/import/mysql/imported
             fi
           else
             sv stop mysql
           fi
 
           cd $home
-          echo "The Vanilla import is starting..."
+          echo "The Flarum import is starting..."
           echo
-          su discourse -c 'bundle exec ruby script/import_scripts/vanilla.rb'
+          su discourse -c 'bundle exec ruby script/import_scripts/flarum_import.rb'
 
     - exec:
         cd: $home

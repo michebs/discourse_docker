@@ -134,6 +134,7 @@ RUN useradd discourse -s /bin/bash -m -U &&\
     cd /var/www &&\
     git clone --depth 1 https://github.com/discourse/discourse.git &&\
     cd discourse &&\
+    git checkout import &&\
     git remote set-branches --add origin tests-passed &&\
     chown -R discourse:discourse /var/www/discourse &&\
     cd /var/www/discourse &&\
